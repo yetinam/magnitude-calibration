@@ -258,7 +258,7 @@ def add_prediction(data,
 
 def calc_means(data, metric):
     """
-    Calculates means and residuals for each
+    Calculates mean magnitude for each event and residuals for each measurement
     """
     metric = f'PRED_{metric}'
     mean = {event: val[metric] for event, val in data.groupby('EVENT').mean().iterrows()}
@@ -269,6 +269,16 @@ def calc_means(data, metric):
 
 
 def distance_depth_correction(x_ref, g, vmin=None, vmax=None, ax=None, cmap='viridis'):
+    """
+    Plot distance and depth correction
+    :param x_ref: See estimate_attenuation_correction
+    :param g: See estimate_attenuation_correction
+    :param vmin: Minimum value for plot
+    :param vmax: Maximum value for plot
+    :param ax: matplotlib axis
+    :param cmap: Colormap
+    :return: Colorbar to be added to figure
+    """
     if not ax:
         fig = plt.figure(figsize=(15, 10))
         ax = fig.add_subplot(111)
@@ -288,6 +298,13 @@ def distance_depth_correction(x_ref, g, vmin=None, vmax=None, ax=None, cmap='vir
 
 
 def remove_outliers(data, metric, max_dev=2.0):
+    """
+    Removes outliers from the data set
+    :param data: Data set
+    :param metric: Name of feature column
+    :param max_dev: Detection threshold for outlier in terms of number of STDs
+    :return: Data without outliers
+    """
     rmse = np.sqrt(np.mean(data[f'RESIDUAL_{metric}'] ** 2))
     outliers = (np.abs(data[f'RESIDUAL_{metric}'].values) > (max_dev * rmse))
     outliers[np.isnan(outliers)] = True
@@ -299,6 +316,13 @@ def remove_outliers(data, metric, max_dev=2.0):
 
 
 def create_boosting_scale(data, metric, epochs=100):
+    """
+    Creates a homogeneous boosting tree scale by combining three boosting trees with different training sets
+    :param data: Data set
+    :param metric: Name of feature column
+    :param epochs: Number of epochs for the boosting tree
+    :return: Data set with new BOOST column
+    """
     events = data['EVENT'].unique()
     target = f'MEAN_PRED_{metric}'
     rand = np.random.random(len(events))
@@ -329,16 +353,28 @@ def create_boosting_scale(data, metric, epochs=100):
     return data
 
 
-def predict_ml_boost(df, keys, target, depth=12, epochs=100, gpu=False, splitted=False, verbosity=1):
+def predict_ml_boost(data, keys, target, depth=12, epochs=100, gpu=False, splitted=False, verbosity=1):
+    """
+    Trains a boosting tree scale on the test set
+    :param data: Data set
+    :param keys: Keys to use for regression
+    :param target: Gold standard magnitude
+    :param depth: Depth of the boosting tree
+    :param epochs: Number of epochs for the boosting tree
+    :param gpu: Use GPU
+    :param splitted: Enable if data is given as a tuple of tree data sets for training, dev and test
+    :param verbosity: 1 - verbose output    0 - silent
+    :return:
+    """
     if splitted:
-        df_train = df[0]
-        df_dev = df[1]
-        df_test = df[2]
+        df_train = data[0]
+        df_dev = data[1]
+        df_test = data[2]
     else:
-        df = df[~np.isnan(df[target])]
-        df_train = df[df['SPLIT'] == 'TRAIN']
-        df_dev = df[df['SPLIT'] == 'DEV']
-        df_test = df[df['SPLIT'] == 'TEST']
+        data = data[~np.isnan(data[target])]
+        df_train = data[data['SPLIT'] == 'TRAIN']
+        df_dev = data[data['SPLIT'] == 'DEV']
+        df_test = data[data['SPLIT'] == 'TEST']
 
     d_train = xgb.DMatrix(df_train[keys].values, df_train[target].values)
     d_dev = xgb.DMatrix(df_dev[keys].values, df_dev[target].values)
