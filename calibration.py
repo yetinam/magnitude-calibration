@@ -1,7 +1,12 @@
 import numpy as np
 import pandas as pd
-import gurobipy as solver
-from gurobipy import GRB
+try:
+    import gurobipy as solver
+    from gurobipy import GRB
+    has_gurobi=True
+except ImportError:
+    has_gurobi=False
+    print('Did not detect working Gurobi installation. Calibration of magnitude scales is disabled.')
 from sklearn.neighbors import KNeighborsRegressor, NearestNeighbors
 import matplotlib.pyplot as plt
 import xgboost as xgb
@@ -42,6 +47,9 @@ def estimate_attenuation_correction(data,
     :return: If knn_correction: station correction, distance depth correction, source correction
     :return: If not knn_correction: station correction, distance depth correction
     """
+    if not has_gurobi:
+        print('Calibration requires Gurobi, but no working Gurobi installation was detected. Aborting.')
+        return
     np.random.seed(42)
 
     stations = sorted(list(set(data['STATION'].values)))
