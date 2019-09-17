@@ -8,7 +8,7 @@ The correction functions consist of three parts:
 It further provides functions to reduce uncertainty through multi-feature estimation using boosting tree regression.
 
 ## Requirements
-The scripts use Python>3.5. Please install python requirements with `pip install -r requirements.txt`.
+The scripts use Python>=3.5. Please install python requirements with `pip install -r requirements.txt`.
 
 Additionally the script relies on the Gurobi Optimizer for quadratic optimization.
 Gurobi provides free Academic Licenses (http://www.gurobi.com/academia/for-universities).
