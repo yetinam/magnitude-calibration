@@ -18,5 +18,12 @@ Please also install the additional Gurobi python library.
 For details on usage please consult the Jupyter notebook and refer to the documentation in the code.
 
 ## Citation
-`@article{munchmeyer2019,
- }`
+```
+@article{munchmeyer2019,
+    author = {Münchmeyer, Jannes and Bindi, Dino and Sippl, Christian and Leser, Ulf and Tilmann, Frederik},
+    title = "{Low uncertainty multi-feature magnitude estimation with 3D corrections and boosting tree regression: application to North Chile}",
+    journal = {Geophysical Journal International},
+    year = {2019},
+    doi = {10.1093/gji/ggz416}
+}
+```
