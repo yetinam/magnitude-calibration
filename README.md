@@ -27,3 +27,6 @@ For details on usage please consult the Jupyter notebook and refer to the docume
     doi = {10.1093/gji/ggz416}
 }
 ```
+
+## License
+This software is licensed under GPL v. 3.0. For the calibration of magnitude scales, this software interacts with the Gurobi Solver Software via the gurobipy API; Gurobi Solver Software and the gurobipy API are only available under the End-User License Agreement as provided by Gurobi Optimization, LLC, ("Gurobi EULA"). You need your own license under the Gurobi EULA to use this functionality.
